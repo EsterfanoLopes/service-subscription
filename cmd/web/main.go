@@ -1,14 +1,18 @@
 package main
 
-import "subscription-service/configs"
+import (
+	"subscription-service/setup"
+)
 
 const webPort = "8080"
 
 func main() {
 	// connect to the database
-	db := configs.InitDB()
+	db := setup.InitDB()
 	db.Ping()
+
 	// create sessions
+	sess := setup.InitSession()
 
 	// create channels
 
