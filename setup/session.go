@@ -11,7 +11,7 @@ import (
 func InitSession() *scs.SessionManager {
 	// set up session
 	session := scs.New()
-	session.Store = redisstore.New(setup.InitRedis())
+	session.Store = redisstore.New(InitRedis())
 	session.Lifetime = time.Hour * 24
 	session.Cookie.Persist = true
 	session.Cookie.SameSite = http.SameSiteLaxMode
