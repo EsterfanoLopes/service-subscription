@@ -1,1 +1,5 @@
-db-data/*
+.DS_Store
+
+.vscode/
+db-data/
+bin/
