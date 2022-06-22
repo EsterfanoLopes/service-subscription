@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"subscription-service/data"
 	"subscription-service/setup"
 	"sync"
 	"syscall"
@@ -19,13 +20,17 @@ func main() {
 	// create waitgroup
 	var wg sync.WaitGroup
 
+	// init db
+	db := setup.InitDB()
+
 	// set up the application config
 	app := Config{
 		Session:  setup.InitSession(),
-		DB:       setup.InitDB(),
+		DB:       db,
 		InfoLog:  setup.NewInfoLogger(),
 		ErrorLog: setup.NewErrorLogger(),
 		Wait:     &wg,
+		Models:   data.New(db),
 	}
 
 	// set up email
