@@ -1,7 +1,9 @@
 package setup
 
 import (
+	"encoding/gob"
 	"net/http"
+	"subscription-service/data"
 	"time"
 
 	"github.com/alexedwards/scs/redisstore"
@@ -9,6 +11,8 @@ import (
 )
 
 func InitSession() *scs.SessionManager {
+	gob.Register(data.User{})
+
 	// set up session
 	session := scs.New()
 	session.Store = redisstore.New(InitRedis())
