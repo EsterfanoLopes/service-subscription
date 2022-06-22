@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"subscription-service/setup"
 	"sync"
+	"syscall"
 )
 
 const webPort = "8080"
@@ -27,6 +30,9 @@ func main() {
 
 	// set up email
 
+	// listen for signals
+	go app.ListenForShutdown()
+
 	// listen for web connections
 	app.serve()
 }
@@ -43,4 +49,22 @@ func (app *Config) serve() {
 	if err != nil {
 		log.Panic(err)
 	}
+}
+
+func (app *Config) ListenForShutdown() {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	app.shutdown()
+	os.Exit(0)
+}
+
+func (app *Config) shutdown() {
+	// perform any cleanup tasks
+	app.InfoLog.Println("would run cleanup tasks...")
+
+	// block until witgroup is empty
+	app.Wait.Wait()
+
+	app.InfoLog.Println("closing channels and shutting down application...")
 }
