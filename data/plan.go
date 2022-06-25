@@ -17,7 +17,7 @@ type Plan struct {
 	UpdatedAt           time.Time
 }
 
-func (p *Plan) GetAll() ([]*Plan, error) {
+func (p *Plan) GetAll() ([]Plan, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -29,7 +29,7 @@ func (p *Plan) GetAll() ([]*Plan, error) {
 	}
 	defer rows.Close()
 
-	var plans []*Plan
+	var plans []Plan
 
 	for rows.Next() {
 		var plan Plan
@@ -47,7 +47,7 @@ func (p *Plan) GetAll() ([]*Plan, error) {
 			return nil, err
 		}
 
-		plans = append(plans, &plan)
+		plans = append(plans, plan)
 	}
 
 	return plans, nil

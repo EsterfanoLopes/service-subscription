@@ -25,6 +25,8 @@ func (app *Config) routes() http.Handler {
 	mux.Post("/register", app.PostRegisterPage)
 	mux.Get("/activate", app.ActivatePage)
 
+	mux.Get("/plans", app.ChooseSubscription)
+
 	// mux.Get("/test-email", func(w http.ResponseWriter, r *http.Request) {
 	// 	m := mailer.Mail{
 	// 		Domain:      "localhost",

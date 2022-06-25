@@ -15,7 +15,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{range inde .Data "plan"}}
+                        {{range index .Data "plans"}}
                             <tr>
                                 <td>{{.PlanName}}</td>
                                 <td class="text-center">{{.PlanAmountFormatted}}/month</td>
@@ -37,12 +37,12 @@
         function selectPlan(x, plan) {
             Swal.fire({
                 title: 'Subscribe',
-                html: 'Are you sure you want to subcribe to the ' + plan +  '?'
+                html: 'Are you sure you want to subcribe to the ' + plan +  '?',
                 showCancelButton: true,
                 confirmButtonText: 'Subscribe',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = '/subscribe?id' + x
+                    window.location.href = '/subscribe?id=' + x
                 }
             })
         }
