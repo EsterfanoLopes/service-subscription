@@ -11,13 +11,15 @@ import (
 )
 
 type Config struct {
-	Session  *scs.SessionManager
-	DB       *sql.DB
-	InfoLog  *log.Logger
-	ErrorLog *log.Logger
-	Wait     *sync.WaitGroup
-	Models   data.Models
-	Mailer   mailer.Mail
+	Session       *scs.SessionManager
+	DB            *sql.DB
+	InfoLog       *log.Logger
+	ErrorLog      *log.Logger
+	Wait          *sync.WaitGroup
+	Models        data.Models
+	Mailer        mailer.Mail
+	ErrorChan     chan error
+	ErrorChanDone chan bool
 }
 
 func (app *Config) ListenForMail() {
