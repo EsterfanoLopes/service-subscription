@@ -37,9 +37,9 @@ type Message struct {
 	Template    string
 }
 
-// a function to listem for messages on the mailer chan
-
 func (m *Mail) SendMail(msg Message, errorChan chan error) {
+	defer m.Wait.Done()
+
 	// defaults
 	if msg.Template == "" {
 		msg.Template = "mail"

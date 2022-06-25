@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"subscription-service/cmd/web/mailer"
 	"subscription-service/data"
 	"sync"
 
@@ -16,4 +17,18 @@ type Config struct {
 	ErrorLog *log.Logger
 	Wait     *sync.WaitGroup
 	Models   data.Models
+	Mailer   mailer.Mail
+}
+
+func (app *Config) ListenForMail() {
+	for {
+		select {
+		case msg := <-app.Mailer.MailerChan:
+			go app.Mailer.SendMail(msg, app.Mailer.ErrorChan)
+		case err := <-app.Mailer.ErrorChan:
+			app.ErrorLog.Println(err)
+		case <-app.Mailer.DoneChan:
+			return
+		}
+	}
 }

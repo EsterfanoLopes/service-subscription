@@ -2,8 +2,6 @@ package main
 
 import (
 	"net/http"
-	"subscription-service/cmd/web/mailer"
-	"sync"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -27,25 +25,25 @@ func (app *Config) routes() http.Handler {
 	mux.Post("/register", app.PostRegisterPage)
 	mux.Post("/activate-account", app.ActivatePage)
 
-	mux.Get("/test-email", func(w http.ResponseWriter, r *http.Request) {
-		m := mailer.Mail{
-			Domain:      "localhost",
-			Host:        "localhost",
-			Port:        1025,
-			Encryption:  "",
-			FromAddress: "info@test.com",
-			FromName:    "info",
-			Wait:        &sync.WaitGroup{},
-			ErrorChan:   make(chan error),
-		}
-		msg := mailer.Message{
-			To:      "me@here.com",
-			Subject: "Test email",
-			Data:    "Hello world!",
-		}
+	// mux.Get("/test-email", func(w http.ResponseWriter, r *http.Request) {
+	// 	m := mailer.Mail{
+	// 		Domain:      "localhost",
+	// 		Host:        "localhost",
+	// 		Port:        1025,
+	// 		Encryption:  "",
+	// 		FromAddress: "info@test.com",
+	// 		FromName:    "info",
+	// 		Wait:        &sync.WaitGroup{},
+	// 		ErrorChan:   make(chan error),
+	// 	}
+	// 	msg := mailer.Message{
+	// 		To:      "me@here.com",
+	// 		Subject: "Test email",
+	// 		Data:    "Hello world!",
+	// 	}
 
-		m.SendMail(msg, make(chan error))
-	})
+	// 	m.SendMail(msg, make(chan error))
+	// })
 
 	return mux
 }

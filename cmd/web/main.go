@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"subscription-service/cmd/web/mailer"
 	"subscription-service/data"
 	"subscription-service/setup"
 	"sync"
@@ -34,6 +35,8 @@ func main() {
 	}
 
 	// set up email
+	app.Mailer = app.createMail()
+	go app.ListenForMail()
 
 	// listen for signals
 	go app.ListenForShutdown()
@@ -72,4 +75,25 @@ func (app *Config) shutdown() {
 	app.Wait.Wait()
 
 	app.InfoLog.Println("closing channels and shutting down application...")
+}
+
+func (app *Config) createMail() mailer.Mail {
+	errorChan := make(chan error)
+	mailerChan := make(chan mailer.Message, 100)
+	mailerDoneChan := make(chan bool)
+
+	m := mailer.Mail{
+		Domain:      "localhost",
+		Host:        "localhost",
+		Port:        1025,
+		Encryption:  "none",
+		FromAddress: "info@test.com",
+		FromName:    "info",
+		Wait:        app.Wait,
+		ErrorChan:   errorChan,
+		MailerChan:  mailerChan,
+		DoneChan:    mailerDoneChan,
+	}
+
+	return m
 }
