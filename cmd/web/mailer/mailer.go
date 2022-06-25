@@ -23,7 +23,7 @@ type Mail struct {
 	Wait        *sync.WaitGroup
 	MailerChan  chan Message
 	ErrorChan   chan error
-	DoenChan    chan bool
+	DoneChan    chan bool
 }
 
 type Message struct {
@@ -39,7 +39,7 @@ type Message struct {
 
 // a function to listem for messages on the mailer chan
 
-func (m *Mail) sendMail(msg Message, errorChan chan error) {
+func (m *Mail) SendMail(msg Message, errorChan chan error) {
 	// defaults
 	if msg.Template == "" {
 		msg.Template = "mail"
