@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 	"subscription-service/cmd/web/mailer"
 	"subscription-service/data"
 )
@@ -152,10 +153,30 @@ func (app *Config) ActivatePage(w http.ResponseWriter, r *http.Request) {
 
 func (app *Config) SubscribeToPlan(w http.ResponseWriter, r *http.Request) {
 	// get the id of the plan that is chosen
+	id := r.URL.Query().Get("id")
+
+	planID, err := strconv.Atoi(id)
+	if err != nil {
+		app.Session.Put(r.Context(), "error", "bad address.")
+		http.Redirect(w, r, "/", http.StatusBadRequest)
+		return
+	}
 
 	// get the plan from the database
+	plan, err := app.Models.Plan.GetOne(planID)
+	if err != nil {
+		app.Session.Put(r.Context(), "error", "Unable to find plan.")
+		http.Redirect(w, r, "/members/plans", http.StatusSeeOther)
+		return
+	}
 
 	// get the user from the session
+	user, ok := app.Session.Get(r.Context(), "user").(data.User)
+	if !ok {
+		app.Session.Put(r.Context(), "error", "Login first.")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 
 	// generate an invoice
 
@@ -171,11 +192,6 @@ func (app *Config) SubscribeToPlan(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Config) ChooseSubscription(w http.ResponseWriter, r *http.Request) {
-	if !app.Session.Exists(r.Context(), "userID") {
-		app.Session.Put(r.Context(), "warning", "you must login to see this page")
-		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-	}
-
 	plans, err := app.Models.Plan.GetAll()
 	if err != nil {
 		app.ErrorLog.Println(err)
