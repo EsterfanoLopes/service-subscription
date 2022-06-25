@@ -122,7 +122,7 @@ func (app *Config) PostRegisterPage(w http.ResponseWriter, r *http.Request) {
 func (app *Config) ActivatePage(w http.ResponseWriter, r *http.Request) {
 	// validate url
 	url := r.RequestURI
-	testURL := fmt.Sprintf("http://localhost%s", url)
+	testURL := fmt.Sprintf("http://localhost:8080%s", url)
 	okay := VerifyToken(testURL)
 	if !okay {
 		app.Session.Put(r.Context(), "error", "Invalid token.")
