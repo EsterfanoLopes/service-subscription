@@ -1,0 +1,71 @@
+package main
+
+import (
+	"encoding/gob"
+	"log"
+	"net/http"
+	"os"
+	"subscription-service/cmd/web/mailer"
+	"subscription-service/data"
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/alexedwards/scs/v2"
+)
+
+var testApp Config
+
+func TestMain(m *testing.M) {
+	gob.Register(data.User{})
+
+	session := scs.New()
+	session.Lifetime = time.Hour * 24
+	session.Cookie.Persist = true
+	session.Cookie.SameSite = http.SameSiteLaxMode
+	session.Cookie.Secure = true
+
+	testApp = Config{
+		Session:       session,
+		DB:            nil,
+		InfoLog:       log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile),
+		ErrorLog:      log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime),
+		Wait:          &sync.WaitGroup{},
+		ErrorChan:     make(chan error),
+		ErrorChanDone: make(chan bool),
+	}
+
+	// create a dummy mailer
+	errorChan := make(chan error)
+	mailerChan := make(chan mailer.Message, 100)
+	mailerDoneChan := make(chan bool)
+
+	testApp.Mailer = mailer.Mail{
+		Wait:       testApp.Wait,
+		ErrorChan:  errorChan,
+		MailerChan: mailerChan,
+		DoneChan:   mailerDoneChan,
+	}
+
+	go func() {
+		select {
+		case <-testApp.Mailer.MailerChan:
+		case <-testApp.Mailer.ErrorChan:
+		case <-testApp.Mailer.DoneChan:
+			return
+		}
+	}()
+
+	go func() {
+		for {
+			select {
+			case err := <-testApp.ErrorChan:
+				testApp.ErrorLog.Println(err)
+			case <-testApp.ErrorChanDone:
+				return
+			}
+		}
+	}()
+
+	os.Exit(m.Run())
+}
