@@ -226,7 +226,7 @@ func (app *Config) SubscribeToPlan(w http.ResponseWriter, r *http.Request) {
 		app.sendEmail(msg)
 
 		// test app error chan
-		app.ErrorChan <- errors.New("some custom error.")
+		app.ErrorChan <- errors.New("some custom error")
 	}()
 
 	// subscribe the user to an account

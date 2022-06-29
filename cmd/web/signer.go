@@ -40,14 +40,7 @@ func VerifyToken(token string) bool {
 	s := goalone.New(secretKey, goalone.Timestamp)
 	_, err := s.Unsign([]byte(token))
 
-	if err != nil {
-		// signature is not valid. Token was tampered with, forged, or maybe it's
-		// not even a token at all! Either way, it's not safe to use it.
-		return false
-	}
-	// valid hash
-	return true
-
+	return err == nil
 }
 
 // Expired checks to see if a token has expired
