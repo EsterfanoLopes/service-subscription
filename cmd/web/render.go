@@ -74,3 +74,7 @@ func (app *Config) AddDefaultData(td *TemplateData, r *http.Request) *TemplateDa
 
 	return td
 }
+
+func (app *Config) IsAuthenticated(r *http.Request) bool {
+	return app.Session.Exists(r.Context(), "userID")
+}
